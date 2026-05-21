@@ -1,0 +1,38 @@
+#  overthinkos/debian — the Debian image family, split out of the main
+#  overthink repo (2026-05). Mounted as a git submodule at image/debian.
+#
+#  This repo VENDORS NOTHING. It composes the canonical ov layers and the
+#  shared build-config (distro/builder/init) entirely by GITHUB REFERENCE into
+#  github.com/overthinkos/overthink — every layer in image.yml is an
+#  `@github.com/...` ref, and build.yml is a remote include. There is no
+#  duplicated config.
+#
+#  The Debian bases root at the upstream docker.io `debian:13` image directly,
+#  so this repo needs NO remote base include (unlike cachyos, which owns its
+#  base, or arch, which remote-includes arch-base.yml). Nothing in the main
+#  repo consumes any Debian image, so there is NO main ↔ debian coupling in
+#  either direction — the only edge is debian → main (for layers + build.yml).
+#
+#  Directly buildable: `ov image build debian` (the build verb defaults to this
+#  overthink.yml). From the parent repo: `ov -C image/debian image build
+#  debian`, or anywhere: `ov --repo overthinkos/debian image build debian`.
+version: 2026.141.1600
+defaults:
+    platform:
+        - linux/amd64
+    tag: auto
+    registry: ghcr.io/overthinkos
+    build:
+        - deb
+    merge:
+        auto: false
+        max_mb: 128
+include:
+    # Local per-kind entries (Debian images, VM, deploy bed).
+    - image.yml
+    - vm.yml
+    - deploy.yml
+    # Shared build-config — pulled from the main repo by github reference
+    # (single source of truth, pinned to one tag). Carries distro.debian +
+    # the deb format template + the debootstrap builder template.
+    - '@github.com/overthinkos/overthink/build.yml:v2026.141.1600'

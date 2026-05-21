@@ -1,0 +1,11 @@
+#  Debian deploy bed, split out of the main overthink repo (2026-05).
+#  Disposable VM test bed for the debian-debootstrap bootstrap VM — carries
+#  `disposable: true`, so `ov -C image/debian update debian-debootstrap-vm`
+#  rebuilds it unattended.
+version: 2026.141.1600
+deploy:
+    debian-debootstrap-vm:
+        target: vm
+        vm: debian-debootstrap
+        disposable: true
+        lifecycle: dev

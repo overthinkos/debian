@@ -1,0 +1,41 @@
+#  Debian bootstrap VM, split out of the main overthink repo (2026-05).
+#  `source.kind: bootstrap` builds a Debian rootfs from scratch via debootstrap
+#  inside the debian-debootstrap-builder container, then boots it under
+#  libvirt/QEMU. The debootstrap builder template + distro.debian config resolve
+#  from the remote-included build.yml.
+version: 2026.141.1600
+vm:
+    debian-debootstrap:
+        source:
+            kind: bootstrap
+            builder: debootstrap
+            builder_image: debian-debootstrap-builder
+            distro: debian
+            package:
+                - sudo
+                - openssh-server
+                - qemu-guest-agent
+                - cloud-init
+            rootfs: ext4
+            kernel_args: console=tty0 console=ttyS0,115200
+        disk_size: 20G
+        ram: 4G
+        cpu: 2
+        machine: q35
+        firmware: uefi-insecure
+        network:
+            mode: user
+        ssh:
+            user: debian
+            port: 12227
+            key_source: generate
+        cloud_init:
+            user:
+                - name: debian
+                  sudo: true
+                  shell: /bin/bash
+            runcmd:
+                - systemctl enable --now ssh
+                - systemctl enable --now qemu-guest-agent
+                # Diagnostic: write boot state to /boot for post-mortem mount.
+                - "{ ip a; echo ===listen===; ss -tlnp; echo ===ssh===; systemctl status ssh --no-pager; } > /boot/ov-diag.txt 2>&1"
