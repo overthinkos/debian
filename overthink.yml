@@ -16,7 +16,7 @@
 #  Directly buildable: `ov image build debian` (the build verb defaults to this
 #  overthink.yml). From the parent repo: `ov -C image/debian image build
 #  debian`, or anywhere: `ov --repo overthinkos/debian image build debian`.
-version: 2026.143.844
+version: 2026.144.1443
 defaults:
     platform:
         - linux/amd64
@@ -31,160 +31,16 @@ import:
     # Shared build-config vocabulary (distro.debian + the deb format template +
     # the debootstrap builder template) — flat root import, pinned to one tag.
     - '@github.com/overthinkos/overthink/build.yml:v2026.141.1600'
-image:
-    debian-debootstrap-builder:
-        base: debian:13
-        distro:
-            - debian:13
-            - debian
-        build:
-            - deb
-        layer:
-            - '@github.com/overthinkos/overthink/layers/debootstrap-builder:v2026.141.1600'
-    debian-debootstrap:
-        from: builder:debootstrap
-        bootstrap_builder_image: debian-debootstrap-builder
-        distro:
-            - debian:13
-            - debian
-        build:
-            - deb
-    debian:
-        base: debian:13
-        distro:
-            - debian:13
-            - debian
-        build:
-            - deb
-        builder:
-            cargo: debian-builder
-            npm: debian-builder
-            pixi: debian-builder
-        produce:
-            - pixi
-            - npm
-            - cargo
-    debian-builder:
-        base: debian
-        layer:
-            - '@github.com/overthinkos/overthink/layers/pixi:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/nodejs:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/build-toolchain:v2026.141.1600'
-        produce:
-            - pixi
-            - npm
-            - cargo
-    debian-coder:
-        base: debian
-        layer:
-            - '@github.com/overthinkos/overthink/layers/agent-forwarding:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/sshd:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/ov-full:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/ov-mcp:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/container-nesting:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/dbus:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/tmux:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/language-runtimes:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/golang:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/nodejs:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/rust:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/pixi:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/uv:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/build-toolchain:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/dev-tools:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/pre-commit:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/direnv:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/gh:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/typst:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/asciinema:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/claude-code:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/codex:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/gemini:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/forgecode:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/oracle:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/devops-tools:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/kubernetes:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/docker-ce:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/github-actions:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/google-cloud:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/google-cloud-npm:v2026.141.1600'
-            - '@github.com/overthinkos/overthink/layers/grafana-tools:v2026.141.1600'
-        port:
-            - 2222:2222
-            - 18765:18765
-        eval:
-            - command: test -x ${HOME}/.npm-global/bin/claude && test -x ${HOME}/.npm-global/bin/codex && test -x ${HOME}/.npm-global/bin/gemini && test -x ${HOME}/.npm-global/bin/forge
-              id: debian-coder-ai-clis
-              exit_status: 0
-            - command: test -x /usr/bin/go && test -x /usr/bin/node && { test -x ${HOME}/.cargo/bin/cargo || test -x /usr/bin/cargo; }
-              id: debian-coder-languages
-              exit_status: 0
-            - command: test -x /usr/bin/kubectl && test -x /usr/bin/docker && test -x /usr/local/bin/aws && test -x /usr/bin/gcloud && test -x /usr/local/bin/tofu
-              id: debian-coder-devops
-              exit_status: 0
-            - command: test -x /usr/local/bin/ov
-              id: debian-coder-ov
-              exit_status: 0
-            - addr: 127.0.0.1:${HOST_PORT:2222}
-              id: debian-coder-sshd-port
-              timeout: 5s
-              scope: deploy
-              reachable: true
-            - command: ov version
-              id: debian-coder-ov-version
-              scope: deploy
-              in_container: true
-              exit_status: 0
-            - addr: 127.0.0.1:${HOST_PORT:18765}
-              id: debian-coder-mcp-port
-              timeout: 5s
-              scope: deploy
-              reachable: true
-vm:
-    debian-debootstrap:
-        #  `source.kind: bootstrap` builds a Debian rootfs from scratch via
-        #  debootstrap inside the debian-debootstrap-builder container, then boots
-        #  it under libvirt/QEMU. The debootstrap builder template + distro.debian
-        #  config resolve from the imported build.yml.
-        source:
-            kind: bootstrap
-            builder: debootstrap
-            builder_image: debian-debootstrap-builder
-            distro: debian
-            package:
-                - sudo
-                - openssh-server
-                - qemu-guest-agent
-                - cloud-init
-            rootfs: ext4
-            kernel_args: console=tty0 console=ttyS0,115200
-        disk_size: 20G
-        ram: 4G
-        cpu: 2
-        machine: q35
-        firmware: uefi-insecure
-        network:
-            mode: user
-        ssh:
-            user: debian
-            port: 12227
-            key_source: generate
-        cloud_init:
-            users:
-                - name: debian
-                  sudo: true
-                  shell: /bin/bash
-            runcmd:
-                - systemctl enable --now ssh
-                - systemctl enable --now qemu-guest-agent
-                # Diagnostic: write boot state to /boot for post-mortem mount.
-                - "{ ip a; echo ===listen===; ss -tlnp; echo ===ssh===; systemctl status ssh --no-pager; } > /boot/ov-diag.txt 2>&1"
+    - image.yml
+    - vm.yml
+    - pod.yml
+    - k8s.yml
 eval:
     # Disposable R10 test bed for the debian bootstrap VM (kind:eval — the
     # 2026-05 deploy→eval unification moved repo-shipped disposable beds out of
     # deploy.yml). disposable: true is the sole authorization for the unattended
-    # destroy+rebuild driven by `ov eval run debian-debootstrap-vm`.
-    debian-debootstrap-vm:
+    # destroy+rebuild driven by `ov eval run eval-debian-debootstrap-vm`.
+    eval-debian-debootstrap-vm:
         target: vm
         vm: debian-debootstrap
         disposable: true

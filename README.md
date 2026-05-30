@@ -10,7 +10,7 @@ of the main repo.
 |---|---|
 | `image:` | `debian` (base), `debian-builder`, `debian-coder`, `debian-debootstrap`, `debian-debootstrap-builder` |
 | `vm:` | `debian-debootstrap` (bootstrap-from-scratch via debootstrap) |
-| `deploy:` | `debian-debootstrap-vm` (disposable bootstrap-VM bed) |
+| `deploy:` | `eval-debian-debootstrap-vm` (disposable bootstrap-VM bed) |
 
 ## Composition by reference — nothing is vendored
 
@@ -54,13 +54,13 @@ The first build resolves the upstream github references into
 `~/.cache/ov/repos/` and materializes the referenced layers under
 `.build/_layers/`.
 
-## debootstrap-from-scratch (`debian-debootstrap` / `debian-debootstrap-vm`)
+## debootstrap-from-scratch (`debian-debootstrap` / `eval-debian-debootstrap-vm`)
 
 `debian-debootstrap` builds a Debian rootfs from scratch via `debootstrap`
 inside the privileged `debian-debootstrap-builder` container (`from:
-builder:debootstrap`). `debian-debootstrap-vm` boots that rootfs under
+builder:debootstrap`). `eval-debian-debootstrap-vm` boots that rootfs under
 libvirt/QEMU and carries `disposable: true`, so `ov -C image/debian update
-debian-debootstrap-vm` rebuilds it unattended.
+eval-debian-debootstrap-vm` rebuilds it unattended.
 
 ## Requirements
 
