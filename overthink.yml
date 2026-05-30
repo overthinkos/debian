@@ -30,7 +30,7 @@ defaults:
 import:
     # Shared build-config vocabulary (distro.debian + the deb format template +
     # the debootstrap builder template) — flat root import, pinned to one tag.
-    - '@github.com/overthinkos/overthink/build.yml:v2026.141.1600'
+    - '@github.com/overthinkos/overthink/build.yml:v2026.150.1904'
     - image.yml
     - vm.yml
     - pod.yml
