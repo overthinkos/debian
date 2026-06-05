@@ -16,7 +16,7 @@
 #  Directly buildable: `ov image build debian` (the build verb defaults to this
 #  overthink.yml). From the parent repo: `ov -C image/debian image build
 #  debian`, or anywhere: `ov --repo overthinkos/debian image build debian`.
-version: 2026.155.1801
+version: 2026.156.557
 defaults:
     platform:
         - linux/amd64
@@ -31,7 +31,7 @@ import:
     # Shared build-config vocabulary (distro.debian + the deb format template +
     # the debootstrap builder template) — flat root import, pinned to one tag.
     - '@github.com/overthinkos/overthink/build.yml:v2026.150.1904'
-    - image.yml
+    - box.yml
     - vm.yml
     - pod.yml
     - k8s.yml
