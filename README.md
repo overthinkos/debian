@@ -17,7 +17,7 @@ of the main repo.
 This repo contains **no layers and no build-config of its own**. Everything is
 pulled from `github.com/overthinkos/overthink` by **github reference**:
 
-- every layer in `image.yml` is an `@github.com/overthinkos/overthink/layers/<name>:<tag>` ref;
+- every layer in `box.yml` is an `@github.com/overthinkos/overthink/candy/<name>:<tag>` ref;
 - the shared build-config (`build.yml` — distro/builder/init, including the
   `debian` distro definition, the `deb` format template, and the `debootstrap`
   builder template) is a remote `include:` in `overthink.yml`.
@@ -41,7 +41,7 @@ pulls nothing back. The image DAG is acyclic
 
 ```bash
 # Inside the submodule (the build verb defaults to overthink.yml):
-ov image build debian
+ov box build debian
 
 # From the parent overthink repo:
 ov -C image/debian image build debian

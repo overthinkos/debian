@@ -13,7 +13,7 @@
 #  string, merged into this repo's root namespace). The only cross-repo edge is
 #  debian → main (layers + build.yml); there is NO main ↔ debian coupling.
 #
-#  Directly buildable: `ov image build debian` (the build verb defaults to this
+#  Directly buildable: `ov box build debian` (the build verb defaults to this
 #  overthink.yml). From the parent repo: `ov -C image/debian image build
 #  debian`, or anywhere: `ov --repo overthinkos/debian image build debian`.
 version: 2026.157.311
@@ -48,7 +48,7 @@ eval:
         # deb localpkg AUTO-RESOLVE witness: ov installed as the `overthink` .deb
         # via localpkg (dpkg-buildpackage in a debian container + apt-get install),
         # mandatory deps auto-resolved by apt from Debian main. tailscale is NOT in
-        # the .deb (not in Debian main) — the ov layer supplies it via the tailscale
+        # the .deb (not in Debian main) — the ov candy supplies it via the tailscale
         # apt repo, so it must ALSO be present after deploy.
         add_candy:
             - '@github.com/overthinkos/overthink/candy/ov:v2026.157.0650'
