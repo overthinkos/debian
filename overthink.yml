@@ -16,7 +16,7 @@
 #  Directly buildable: `ov image build debian` (the build verb defaults to this
 #  overthink.yml). From the parent repo: `ov -C image/debian image build
 #  debian`, or anywhere: `ov --repo overthinkos/debian image build debian`.
-version: 2026.156.1531
+version: 2026.157.311
 defaults:
     platform:
         - linux/amd64
@@ -30,7 +30,7 @@ defaults:
 import:
     # Shared build-config vocabulary (distro.debian + the deb format template +
     # the debootstrap builder template) — flat root import, pinned to one tag.
-    - '@github.com/overthinkos/overthink/build.yml:v2026.150.1904'
+    - '@github.com/overthinkos/overthink/build.yml:v2026.157.0650'
     - box.yml
     - vm.yml
     - pod.yml
@@ -45,3 +45,29 @@ eval:
         vm: debian-debootstrap
         disposable: true
         lifecycle: dev
+        # deb localpkg AUTO-RESOLVE witness: ov installed as the `overthink` .deb
+        # via localpkg (dpkg-buildpackage in a debian container + apt-get install),
+        # mandatory deps auto-resolved by apt from Debian main. tailscale is NOT in
+        # the .deb (not in Debian main) — the ov layer supplies it via the tailscale
+        # apt repo, so it must ALSO be present after deploy.
+        add_candy:
+            - '@github.com/overthinkos/overthink/candy/ov:v2026.157.0650'
+        install_opts:
+            allow_repo_changes: true
+            allow_root_tasks: true
+            skip_incompatible: true # skip composed layers lacking a guest-format section; the localpkg .deb/.rpm Depends/Requires install the packages
+        eval:
+            - id: localpkg-deb-autoresolve
+              scope: deploy
+              description: ov installed as the overthink .deb via localpkg, mandatory deps auto-resolved by apt; tailscale supplied by the ov layer
+              command: |
+                dpkg -s overthink >/dev/null 2>&1 &&
+                dpkg -s podman >/dev/null 2>&1 &&
+                dpkg -s libvirt-daemon-system >/dev/null 2>&1 &&
+                dpkg -s tailscale >/dev/null 2>&1 &&
+                command -v ov >/dev/null 2>&1 &&
+                ov version &&
+                echo LOCALPKG-DEB-AUTORESOLVE-OK
+              stdout:
+                - contains: LOCALPKG-DEB-AUTORESOLVE-OK
+              exit_status: 0
