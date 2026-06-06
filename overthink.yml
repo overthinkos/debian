@@ -30,7 +30,7 @@ defaults:
 import:
     # Shared build-config vocabulary (distro.debian + the deb format template +
     # the debootstrap builder template) — flat root import, pinned to one tag.
-    - '@github.com/overthinkos/overthink/build.yml:v2026.157.0650'
+    - '@github.com/overthinkos/overthink/build.yml:v2026.157.1259'
     - box.yml
     - vm.yml
     - pod.yml
@@ -51,7 +51,7 @@ eval:
         # the .deb (not in Debian main) — the ov candy supplies it via the tailscale
         # apt repo, so it must ALSO be present after deploy.
         add_candy:
-            - '@github.com/overthinkos/overthink/candy/ov:v2026.157.0650'
+            - '@github.com/overthinkos/overthink/candy/ov:v2026.157.1259'
         install_opts:
             allow_repo_changes: true
             allow_root_tasks: true
@@ -70,4 +70,14 @@ eval:
                 echo LOCALPKG-DEB-AUTORESOLVE-OK
               stdout:
                 - contains: LOCALPKG-DEB-AUTORESOLVE-OK
+              exit_status: 0
+            # distro-cascade witness: the per-distro cascade must resolve the
+            # DEBIAN (trixie) tailscale apt repo on this debian guest — deterministically,
+            # NOT ubuntu/noble. The VM chain [debian:13, debian] (distroTagChain)
+            # matches candy/ov's `debian` tag section. This is the original
+            # non-deterministic-collapse bug fixed and proven on a live VM.
+            - id: tailscale-repo-suite-debian-trixie
+              scope: deploy
+              description: distro-cascade resolves the debian/trixie tailscale apt repo (not ubuntu/noble) deterministically
+              command: grep -h 'pkgs[.]tailscale[.]com/stable/debian trixie' /etc/apt/sources.list.d/tailscale.list
               exit_status: 0
