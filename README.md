@@ -1,6 +1,6 @@
 # overthinkos/debian
 
-The **Debian image family** for [Overthink](https://github.com/overthinkos/overthink),
+The **Debian image family** for [OpenCharly](https://github.com/overthinkos/overthink),
 split into its own repository and mounted as a git submodule at `image/debian`
 of the main repo.
 
@@ -20,7 +20,7 @@ pulled from `github.com/overthinkos/overthink` by **github reference**:
 - every layer in `box.yml` is an `@github.com/overthinkos/overthink/candy/<name>:<tag>` ref;
 - the shared build-config (`build.yml` — distro/builder/init, including the
   `debian` distro definition, the `deb` format template, and the `debootstrap`
-  builder template) is a remote `include:` in `overthink.yml`.
+  builder template) is a remote `import:` in `charly.yml`.
 
 The Debian bases root at the upstream docker.io `debian:13` image directly, so
 this repo needs **no remote base include** (unlike `overthinkos/cachyos`, which
@@ -30,7 +30,7 @@ reproducible. There is exactly one definition of every layer — no duplication.
 
 ## No coupling with main
 
-Nothing in the main `overthink` repo consumes any Debian image (no
+Nothing in the main `opencharly` repo consumes any Debian image (no
 `base: debian` image stays in main), so there is **no main ↔ debian coupling**:
 the only edge is `debian → main` (this repo pulls layers + `build.yml`). Main
 pulls nothing back. The image DAG is acyclic
@@ -40,18 +40,18 @@ pulls nothing back. The image DAG is acyclic
 ## Build
 
 ```bash
-# Inside the submodule (the build verb defaults to overthink.yml):
-ov box build debian
+# Inside the submodule (the build verb defaults to charly.yml):
+charly box build debian
 
-# From the parent overthink repo:
-ov -C image/debian image build debian
+# From the parent opencharly repo:
+charly -C image/debian image build debian
 
 # Standalone, against the published repo:
-ov --repo overthinkos/debian image build debian
+charly --repo overthinkos/debian image build debian
 ```
 
 The first build resolves the upstream github references into
-`~/.cache/ov/repos/` and materializes the referenced layers under
+`~/.cache/charly/repos/` and materializes the referenced layers under
 `.build/_layers/`.
 
 ## debootstrap-from-scratch (`debian-debootstrap` / `eval-debian-debootstrap-vm`)
@@ -59,14 +59,14 @@ The first build resolves the upstream github references into
 `debian-debootstrap` builds a Debian rootfs from scratch via `debootstrap`
 inside the privileged `debian-debootstrap-builder` container (`from:
 builder:debootstrap`). `eval-debian-debootstrap-vm` boots that rootfs under
-libvirt/QEMU and carries `disposable: true`, so `ov -C image/debian update
+libvirt/QEMU and carries `disposable: true`, so `charly -C image/debian update
 eval-debian-debootstrap-vm` rebuilds it unattended.
 
 ## Requirements
 
 A build of any image here fetches from the upstream repo, so it needs network
-access and an `ov` recent enough to understand the config's schema version
-(`ov` hard-fails with an "update ov" message if the config is newer than the
+access and a `charly` recent enough to understand the config's schema version
+(`charly` hard-fails with an "update charly" message if the config is newer than the
 binary supports).
 
 ---

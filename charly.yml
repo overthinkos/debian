@@ -1,5 +1,5 @@
 #  overthinkos/debian — the Debian image family, split out of the main
-#  overthink repo (2026-05). Mounted as a git submodule at image/debian.
+#  opencharly repo (2026-05). Mounted as a git submodule at image/debian.
 #
 #  SINGLE-FILE config (2026-05 import-namespace cutover): every local entity
 #  (the debian base + debootstrap family, the debian-coder kitchen-sink image,
@@ -9,14 +9,14 @@
 #
 #  import: is a LIST. Debian roots its bases on the upstream docker.io
 #  `debian:13` image directly (no main base-stack dependency), so it needs NO
-#  `ov` namespace import — only the flat build.yml vocabulary import (a bare
+#  `charly` namespace import — only the flat build.yml vocabulary import (a bare
 #  string, merged into this repo's root namespace). The only cross-repo edge is
 #  debian → main (layers + build.yml); there is NO main ↔ debian coupling.
 #
-#  Directly buildable: `ov box build debian` (the build verb defaults to this
-#  overthink.yml). From the parent repo: `ov -C image/debian image build
-#  debian`, or anywhere: `ov --repo overthinkos/debian image build debian`.
-version: 2026.157.311
+#  Directly buildable: `charly box build debian` (the build verb defaults to this
+#  charly.yml). From the parent repo: `charly -C image/debian image build
+#  debian`, or anywhere: `charly --repo overthinkos/debian image build debian`.
+version: 2026.159.3
 defaults:
     platform:
         - linux/amd64
@@ -30,7 +30,7 @@ defaults:
 import:
     # Shared build-config vocabulary (distro.debian + the deb format template +
     # the debootstrap builder template) — flat root import, pinned to one tag.
-    - '@github.com/overthinkos/overthink/build.yml:v2026.157.1259'
+    - '@github.com/overthinkos/overthink/build.yml:v2026.159.1101'
     - box.yml
     - vm.yml
     - pod.yml
@@ -39,19 +39,19 @@ eval:
     # Disposable R10 test bed for the debian bootstrap VM (kind:eval — the
     # 2026-05 deploy→eval unification moved repo-shipped disposable beds out of
     # deploy.yml). disposable: true is the sole authorization for the unattended
-    # destroy+rebuild driven by `ov eval run eval-debian-debootstrap-vm`.
+    # destroy+rebuild driven by `charly eval run eval-debian-debootstrap-vm`.
     eval-debian-debootstrap-vm:
         target: vm
         vm: debian-debootstrap
         disposable: true
         lifecycle: dev
-        # deb localpkg AUTO-RESOLVE witness: ov installed as the `overthink` .deb
+        # deb localpkg AUTO-RESOLVE witness: charly installed as the `opencharly` .deb
         # via localpkg (dpkg-buildpackage in a debian container + apt-get install),
         # mandatory deps auto-resolved by apt from Debian main. tailscale is NOT in
-        # the .deb (not in Debian main) — the ov candy supplies it via the tailscale
+        # the .deb (not in Debian main) — the charly candy supplies it via the tailscale
         # apt repo, so it must ALSO be present after deploy.
         add_candy:
-            - '@github.com/overthinkos/overthink/candy/ov:v2026.157.1259'
+            - '@github.com/overthinkos/overthink/candy/charly:v2026.159.1101'
         install_opts:
             allow_repo_changes: true
             allow_root_tasks: true
@@ -59,14 +59,14 @@ eval:
         eval:
             - id: localpkg-deb-autoresolve
               scope: deploy
-              description: ov installed as the overthink .deb via localpkg, mandatory deps auto-resolved by apt; tailscale supplied by the ov layer
+              description: charly installed as the opencharly .deb via localpkg, mandatory deps auto-resolved by apt; tailscale supplied by the charly layer
               command: |
-                dpkg -s overthink >/dev/null 2>&1 &&
+                dpkg -s opencharly >/dev/null 2>&1 &&
                 dpkg -s podman >/dev/null 2>&1 &&
                 dpkg -s libvirt-daemon-system >/dev/null 2>&1 &&
                 dpkg -s tailscale >/dev/null 2>&1 &&
-                command -v ov >/dev/null 2>&1 &&
-                ov version &&
+                command -v charly >/dev/null 2>&1 &&
+                charly version &&
                 echo LOCALPKG-DEB-AUTORESOLVE-OK
               stdout:
                 - contains: LOCALPKG-DEB-AUTORESOLVE-OK
@@ -74,7 +74,7 @@ eval:
             # distro-cascade witness: the per-distro cascade must resolve the
             # DEBIAN (trixie) tailscale apt repo on this debian guest — deterministically,
             # NOT ubuntu/noble. The VM chain [debian:13, debian] (distroTagChain)
-            # matches candy/ov's `debian` tag section. This is the original
+            # matches candy/charly's `debian` tag section. This is the original
             # non-deterministic-collapse bug fixed and proven on a live VM.
             - id: tailscale-repo-suite-debian-trixie
               scope: deploy
