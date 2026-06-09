@@ -16,7 +16,7 @@
 #  Directly buildable: `charly box build debian` (the build verb defaults to this
 #  charly.yml). From the parent repo: `charly -C image/debian image build
 #  debian`, or anywhere: `charly --repo overthinkos/debian image build debian`.
-version: 2026.159.1912
+version: 2026.160.1301
 defaults:
     platform:
         - linux/amd64
@@ -27,14 +27,7 @@ defaults:
     merge:
         auto: false
         max_mb: 128
-import:
-    # Shared build-config vocabulary (distro.debian + the deb format template +
-    # the debootstrap builder template) — flat root import, pinned to one tag.
-    - '@github.com/overthinkos/overthink/build.yml:v2026.160.0856'
-    - box.yml
-    - vm.yml
-    - pod.yml
-    - k8s.yml
+import: []
 eval:
     # Disposable R10 test bed for the debian bootstrap VM (kind:eval — the
     # 2026-05 deploy→eval unification moved repo-shipped disposable beds out of
@@ -81,3 +74,49 @@ eval:
               description: distro-cascade resolves the debian/trixie tailscale apt repo (not ubuntu/noble) deterministically
               command: grep -h 'pkgs[.]tailscale[.]com/stable/debian trixie' /etc/apt/sources.list.d/tailscale.list
               exit_status: 0
+vm:
+    debian-debootstrap:
+        #  `source.kind: bootstrap` builds a Debian rootfs from scratch via
+        #  debootstrap inside the debian-debootstrap-builder container, then boots
+        #  it under libvirt/QEMU. The debootstrap builder template + distro.debian
+        #  config resolve from the imported build.yml.
+        source:
+            kind: bootstrap
+            builder: debootstrap
+            builder_image: debian-debootstrap-builder
+            distro: debian
+            package:
+                - sudo
+                - openssh-server
+                - qemu-guest-agent
+                - cloud-init
+            rootfs: ext4
+            kernel_args: console=tty0 console=ttyS0,115200
+        disk_size: 20G
+        ram: 4G
+        cpu: 2
+        machine: q35
+        firmware: uefi-insecure
+        network:
+            mode: user
+        ssh:
+            user: debian
+            port: 12227
+            key_source: generate
+        cloud_init:
+            users:
+                - name: debian
+                  sudo: true
+                  shell: /bin/bash
+            runcmd:
+                - systemctl enable --now ssh
+                - systemctl enable --now qemu-guest-agent
+                # Diagnostic: write boot state to /boot for post-mortem mount.
+                - "{ ip a; echo ===listen===; ss -tlnp; echo ===ssh===; systemctl status ssh --no-pager; } > /boot/charly-diag.txt 2>&1"
+pod: {}
+k8s: {}
+discover:
+    - path: box
+      recursive: true
+    - path: candy
+      recursive: true
