@@ -16,7 +16,7 @@
 #  Directly buildable: `charly box build debian` (the build verb defaults to this
 #  charly.yml). From the parent repo: `charly -C image/debian image build
 #  debian`, or anywhere: `charly --repo overthinkos/debian image build debian`.
-version: 2026.159.3
+version: 2026.159.1912
 defaults:
     platform:
         - linux/amd64
@@ -30,7 +30,7 @@ defaults:
 import:
     # Shared build-config vocabulary (distro.debian + the deb format template +
     # the debootstrap builder template) — flat root import, pinned to one tag.
-    - '@github.com/overthinkos/overthink/build.yml:v2026.159.1101'
+    - '@github.com/overthinkos/overthink/build.yml:v2026.160.0856'
     - box.yml
     - vm.yml
     - pod.yml
@@ -51,7 +51,7 @@ eval:
         # the .deb (not in Debian main) — the charly candy supplies it via the tailscale
         # apt repo, so it must ALSO be present after deploy.
         add_candy:
-            - '@github.com/overthinkos/overthink/candy/charly:v2026.159.1101'
+            - '@github.com/overthinkos/overthink/candy/charly:v2026.160.0856'
         install_opts:
             allow_repo_changes: true
             allow_root_tasks: true
