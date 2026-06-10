@@ -1,5 +1,5 @@
 #  overthinkos/debian — the Debian image family, split out of the main
-#  opencharly repo (2026-05). Mounted as a git submodule at image/debian.
+#  opencharly repo (2026-05). Mounted as a git submodule at box/debian.
 #
 #  SINGLE-FILE config (2026-05 import-namespace cutover): every local entity
 #  (the debian base + debootstrap family, the debian-coder kitchen-sink image,
@@ -14,8 +14,8 @@
 #  debian → main (layers + build.yml); there is NO main ↔ debian coupling.
 #
 #  Directly buildable: `charly box build debian` (the build verb defaults to this
-#  charly.yml). From the parent repo: `charly -C image/debian image build
-#  debian`, or anywhere: `charly --repo overthinkos/debian image build debian`.
+#  charly.yml). From the parent repo: `charly -C box/debian box build
+#  debian`, or anywhere: `charly --repo overthinkos/debian box build debian`.
 version: 2026.160.1301
 defaults:
     platform:

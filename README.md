@@ -1,7 +1,7 @@
 # overthinkos/debian
 
 The **Debian image family** for [OpenCharly](https://github.com/overthinkos/overthink),
-split into its own repository and mounted as a git submodule at `image/debian`
+split into its own repository and mounted as a git submodule at `box/debian`
 of the main repo.
 
 ## What's here
@@ -44,10 +44,10 @@ pulls nothing back. The image DAG is acyclic
 charly box build debian
 
 # From the parent opencharly repo:
-charly -C image/debian image build debian
+charly -C box/debian box build debian
 
 # Standalone, against the published repo:
-charly --repo overthinkos/debian image build debian
+charly --repo overthinkos/debian box build debian
 ```
 
 The first build resolves the upstream github references into
@@ -59,7 +59,7 @@ The first build resolves the upstream github references into
 `debian-debootstrap` builds a Debian rootfs from scratch via `debootstrap`
 inside the privileged `debian-debootstrap-builder` container (`from:
 builder:debootstrap`). `eval-debian-debootstrap-vm` boots that rootfs under
-libvirt/QEMU and carries `disposable: true`, so `charly -C image/debian update
+libvirt/QEMU and carries `disposable: true`, so `charly -C box/debian update
 eval-debian-debootstrap-vm` rebuilds it unattended.
 
 ## Requirements

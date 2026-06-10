@@ -1,4 +1,4 @@
-# image/debian — signpost (not the rule-set)
+# box/debian — signpost (not the rule-set)
 
 This submodule is the **Debian** base image family: an `charly.yml` (plus
 per-kind sibling files) that imports the main repo under the `charly` namespace and `build.yml` flat.
