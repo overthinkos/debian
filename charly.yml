@@ -3,7 +3,7 @@
 #
 #  SINGLE-FILE config (2026-05 import-namespace cutover): every local entity
 #  (the debian base + debootstrap family, the debian-coder kitchen-sink image,
-#  the debian bootstrap VM, the disposable eval bed) is inlined here. This repo
+#  the debian bootstrap VM, the disposable check bed) is inlined here. This repo
 #  VENDORS NOTHING — every layer is an `@github.com/...` ref, and the shared
 #  build-config (distro/builder/init vocabulary) arrives via `import:`.
 #
@@ -16,7 +16,7 @@
 #  Directly buildable: `charly box build debian` (the build verb defaults to this
 #  charly.yml). From the parent repo: `charly -C box/debian box build
 #  debian`, or anywhere: `charly --repo overthinkos/debian box build debian`.
-version: 2026.163.0928
+version: 2026.164.0004
 defaults:
     platform:
         - linux/amd64
@@ -28,12 +28,12 @@ defaults:
         auto: false
         max_mb: 128
 import: []
-eval:
-    # Disposable R10 test bed for the debian bootstrap VM (kind:eval — the
-    # 2026-05 deploy→eval unification moved repo-shipped disposable beds out of
+check:
+    # Disposable R10 test bed for the debian bootstrap VM (kind:check — the
+    # 2026-05 deploy→check unification moved repo-shipped disposable beds out of
     # deploy.yml). disposable: true is the sole authorization for the unattended
-    # destroy+rebuild driven by `charly eval run eval-debian-debootstrap-vm`.
-    eval-debian-debootstrap-vm:
+    # destroy+rebuild driven by `charly check run check-debian-debootstrap-vm`.
+    check-debian-debootstrap-vm:
         target: vm
         vm: debian-debootstrap
         disposable: true
@@ -49,31 +49,37 @@ eval:
             allow_repo_changes: true
             allow_root_tasks: true
             skip_incompatible: true # skip composed layers lacking a guest-format section; the localpkg .deb/.rpm Depends/Requires install the packages
-        eval:
-            - id: localpkg-deb-autoresolve
-              scope: deploy
-              description: charly installed as the opencharly .deb via localpkg, mandatory deps auto-resolved by apt; tailscale supplied by the charly layer
-              command: |
-                dpkg -s opencharly >/dev/null 2>&1 &&
-                dpkg -s podman >/dev/null 2>&1 &&
-                dpkg -s libvirt-daemon-system >/dev/null 2>&1 &&
-                dpkg -s tailscale >/dev/null 2>&1 &&
-                command -v charly >/dev/null 2>&1 &&
-                charly version &&
-                echo LOCALPKG-DEB-AUTORESOLVE-OK
-              stdout:
-                - contains: LOCALPKG-DEB-AUTORESOLVE-OK
-              exit_status: 0
-            # distro-cascade witness: the per-distro cascade must resolve the
-            # DEBIAN (trixie) tailscale apt repo on this debian guest — deterministically,
-            # NOT ubuntu/noble. The VM chain [debian:13, debian] (distroTagChain)
-            # matches candy/charly's `debian` tag section. This is the original
-            # non-deterministic-collapse bug fixed and proven on a live VM.
-            - id: tailscale-repo-suite-debian-trixie
-              scope: deploy
-              description: distro-cascade resolves the debian/trixie tailscale apt repo (not ubuntu/noble) deterministically
-              command: grep -h 'pkgs[.]tailscale[.]com/stable/debian trixie' /etc/apt/sources.list.d/tailscale.list
-              exit_status: 0
+        scenario:
+            - name: localpkg-deb-autoresolve
+              step:
+                - id: localpkg-deb-autoresolve
+                  description: charly installed as the opencharly .deb via localpkg, mandatory deps auto-resolved by apt; tailscale supplied by the charly layer
+                  command: |
+                    dpkg -s opencharly >/dev/null 2>&1 &&
+                    dpkg -s podman >/dev/null 2>&1 &&
+                    dpkg -s libvirt-daemon-system >/dev/null 2>&1 &&
+                    dpkg -s tailscale >/dev/null 2>&1 &&
+                    command -v charly >/dev/null 2>&1 &&
+                    charly version &&
+                    echo LOCALPKG-DEB-AUTORESOLVE-OK
+                  stdout:
+                    - contains: LOCALPKG-DEB-AUTORESOLVE-OK
+                  exit_status: 0
+                  context:
+                    - runtime
+            - name: tailscale-repo-suite-debian-trixie
+              step:
+                # distro-cascade witness: the per-distro cascade must resolve the
+                # DEBIAN (trixie) tailscale apt repo on this debian guest — deterministically,
+                # NOT ubuntu/noble. The VM chain [debian:13, debian] (distroTagChain)
+                # matches candy/charly's `debian` tag section. This is the original
+                # non-deterministic-collapse bug fixed and proven on a live VM.
+                - id: tailscale-repo-suite-debian-trixie
+                  description: distro-cascade resolves the debian/trixie tailscale apt repo (not ubuntu/noble) deterministically
+                  command: grep -h 'pkgs[.]tailscale[.]com/stable/debian trixie' /etc/apt/sources.list.d/tailscale.list
+                  exit_status: 0
+                  context:
+                    - runtime
 vm:
     debian-debootstrap:
         #  `source.kind: bootstrap` builds a Debian rootfs from scratch via
