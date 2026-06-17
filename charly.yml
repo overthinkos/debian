@@ -38,6 +38,7 @@ check:
         vm: debian-debootstrap
         disposable: true
         lifecycle: dev
+        description: Sole proof the charly toolchain installs as the opencharly .deb via localpkg on a from-scratch debootstrap Debian 13 VM, with apt auto-resolving the mandatory deps and the tailscale apt-repo distro-cascade deterministically picking debian/trixie. Boots a debootstrap Debian 13 rootfs as a libvirt/QEMU VM (uefi-insecure, ssh port 12227), overlays the charly candy as a .deb localpkg, then runs two guest command checks — dpkg -s opencharly/podman/libvirt-daemon-system/tailscale plus charly version (asserting LOCALPKG-DEB-AUTORESOLVE-OK), and a grep asserting tailscale.list resolved to 'debian trixie'.
         # deb localpkg AUTO-RESOLVE witness: charly installed as the `opencharly` .deb
         # via localpkg (dpkg-buildpackage in a debian container + apt-get install),
         # mandatory deps auto-resolved by apt from Debian main. tailscale is NOT in
@@ -78,6 +79,38 @@ check:
               description: distro-cascade resolves the debian/trixie tailscale apt repo (not ubuntu/noble) deterministically
               command: grep -h 'pkgs[.]tailscale[.]com/stable/debian trixie' /etc/apt/sources.list.d/tailscale.list
               exit_status: 0
+              context:
+                - runtime
+    # Disposable R10 pod bed for the debian-coder developer image — closes the
+    # pod×debian cross-cell the submodule previously lacked (it shipped only the
+    # debootstrap VM bed above), mirroring box/fedora's check-fedora-coder-pod on
+    # the deb substrate. No `port:` — every inherited container port (sshd 2222,
+    # charly-mcp 18765) auto-allocates a free 127.0.0.1 host port at deploy,
+    # conflict-free across concurrent beds.
+    check-debian-coder-pod:
+        target: pod
+        box: debian-coder
+        disposable: true
+        lifecycle: dev
+        description: R10 bed for the debian-coder image — proves the Debian developer pod (sshd + language runtimes + AI CLIs on the Debian 13 base) builds and runs as one composed pod. Builds box:debian-coder, deploys it, and runs the composed candies' baked file/package/service/command/addr checks plus the bed's own sshd-service, language-runtime-binary, and charly status --json (status-shows-pod) probes.
+        plan:
+            - check: the supervised sshd service is running in the composed developer pod
+              id: sshd-service-running
+              service: sshd
+              running: true
+              context:
+                - runtime
+            - check: the Go language-runtime binary is baked into the developer pod
+              id: golang-binary-present
+              file: /usr/bin/go
+              exists: true
+            - check: command=charly status --json
+              id: status-shows-pod
+              command: charly status --json
+              in_container: false
+              stdout:
+                - contains: '"kind": "pod"'
+                - contains: check-debian-coder-pod
               context:
                 - runtime
 vm:
