@@ -21,7 +21,7 @@ and the shared build vocabulary is embedded in the `charly` binary:
 - every candy in `charly.yml` is an `@github.com/overthinkos/overthink/candy/<name>:<tag>` ref;
 - the distro/builder/init build vocabulary (the `debian` distro definition, the
   `deb` format template, and the `debootstrap` builder template) is **embedded in
-  the `charly` binary** (`charly/charly.cue`) — `import:` is empty (`import: []`).
+  the `charly` binary** (`charly/charly.yml`) — `import:` is empty (`import: []`).
 
 The Debian bases root at the upstream docker.io `debian:13` image directly, so
 this repo needs **no namespace import** (unlike `overthinkos/cachyos`, which

@@ -6,7 +6,7 @@
 #  the debian bootstrap VM, the disposable check bed) is inlined here. This repo
 #  VENDORS NOTHING — every layer is an `@github.com/...` ref into main's shared
 #  candy library, and the shared build-config (distro/builder/init vocabulary) is
-#  EMBEDDED in the `charly` binary (`charly/charly.cue`) — not imported.
+#  EMBEDDED in the `charly` binary (`charly/charly.yml`) — not imported.
 #
 #  import: is a LIST — here EMPTY (`import: []`). Debian roots its bases on the
 #  upstream docker.io `debian:13` image directly (no main base-stack dependency)
@@ -123,7 +123,7 @@ debian-debootstrap:
         #  `source.kind: bootstrap` builds a Debian rootfs from scratch via
         #  debootstrap inside the debian-debootstrap-builder container, then boots
         #  it under libvirt/QEMU. The debootstrap builder template + distro.debian
-        #  config resolve from the embedded build vocabulary (`charly/charly.cue`).
+        #  config resolve from the embedded build vocabulary (`charly/charly.yml`).
         source:
             kind: bootstrap
             builder: debootstrap
