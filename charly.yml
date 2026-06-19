@@ -4,14 +4,15 @@
 #  SINGLE-FILE config (2026-05 import-namespace cutover): every local entity
 #  (the debian base + debootstrap family, the debian-coder kitchen-sink image,
 #  the debian bootstrap VM, the disposable check bed) is inlined here. This repo
-#  VENDORS NOTHING — every layer is an `@github.com/...` ref, and the shared
-#  build-config (distro/builder/init vocabulary) arrives via `import:`.
+#  VENDORS NOTHING — every layer is an `@github.com/...` ref into main's shared
+#  candy library, and the shared build-config (distro/builder/init vocabulary) is
+#  EMBEDDED in the `charly` binary (`charly/charly.cue`) — not imported.
 #
-#  import: is a LIST. Debian roots its bases on the upstream docker.io
-#  `debian:13` image directly (no main base-stack dependency), so it needs NO
-#  `charly` namespace import — only the flat build.yml vocabulary import (a bare
-#  string, merged into this repo's root namespace). The only cross-repo edge is
-#  debian → main (layers + build.yml); there is NO main ↔ debian coupling.
+#  import: is a LIST — here EMPTY (`import: []`). Debian roots its bases on the
+#  upstream docker.io `debian:13` image directly (no main base-stack dependency)
+#  and the build vocabulary is embedded, so it imports NOTHING. The only cross-repo
+#  edge is debian → main's shared candy layers via `@github` refs; there is NO
+#  main ↔ debian coupling.
 #
 #  Directly buildable: `charly box build debian` (the build verb defaults to this
 #  charly.yml). From the parent repo: `charly -C box/debian box build
@@ -122,7 +123,7 @@ debian-debootstrap:
         #  `source.kind: bootstrap` builds a Debian rootfs from scratch via
         #  debootstrap inside the debian-debootstrap-builder container, then boots
         #  it under libvirt/QEMU. The debootstrap builder template + distro.debian
-        #  config resolve from the imported build.yml.
+        #  config resolve from the embedded build vocabulary (`charly/charly.cue`).
         source:
             kind: bootstrap
             builder: debootstrap
