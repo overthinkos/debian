@@ -1,11 +1,12 @@
-box:
-    name: debian-builder
-    base: debian
-    candy:
-        - '@github.com/overthinkos/overthink/candy/pixi:v2026.166.1222'
-        - '@github.com/overthinkos/overthink/candy/nodejs:v2026.166.1222'
-        - '@github.com/overthinkos/overthink/candy/build-toolchain:v2026.166.1222'
-    produce:
-        - pixi
-        - npm
-        - cargo
+debian-builder:
+    box:
+        base: debian
+        produce:
+            - pixi
+            - npm
+            - cargo
+    debian-builder-candy:
+        candy:
+            - '@github.com/overthinkos/overthink/candy/pixi:v2026.166.1222'
+            - '@github.com/overthinkos/overthink/candy/nodejs:v2026.166.1222'
+            - '@github.com/overthinkos/overthink/candy/build-toolchain:v2026.166.1222'
