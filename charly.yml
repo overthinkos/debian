@@ -17,7 +17,7 @@
 #  Directly buildable: `charly box build debian` (the build verb defaults to this
 #  charly.yml). From the parent repo: `charly -C box/debian box build
 #  debian`, or anywhere: `charly --repo overthinkos/debian box build debian`.
-version: 2026.172.0002
+version: 2026.172.0004
 defaults:
     platform:
         - linux/amd64
@@ -34,8 +34,8 @@ import: []
 # deploy.yml). disposable: true is the sole authorization for the unattended
 # destroy+rebuild driven by `charly check run check-debian-debootstrap-vm`.
 check-debian-debootstrap-vm:
-    bundle:
-        vm: debian-debootstrap
+    vm:
+        from: debian-debootstrap
         disposable: true
         lifecycle: dev
         description: Sole proof the charly toolchain installs as the opencharly .deb via localpkg on a from-scratch debootstrap Debian 13 VM, with apt auto-resolving the mandatory deps and the tailscale apt-repo distro-cascade deterministically picking debian/trixie. Boots a debootstrap Debian 13 rootfs as a libvirt/QEMU VM (uefi-insecure, ssh port 12227), overlays the charly candy as a .deb localpkg, then runs two guest command checks — dpkg -s opencharly/podman/libvirt-daemon-system/tailscale plus charly version (asserting LOCALPKG-DEB-AUTORESOLVE-OK), and a grep asserting tailscale.list resolved to 'debian trixie'.
@@ -91,8 +91,8 @@ check-debian-debootstrap-vm:
 # charly-mcp 18765) auto-allocates a free 127.0.0.1 host port at deploy,
 # conflict-free across concurrent beds.
 check-debian-coder-pod:
-    bundle:
-        box: debian-coder
+    pod:
+        image: debian-coder
         disposable: true
         lifecycle: dev
         description: R10 bed for the debian-coder image — proves the Debian developer pod (sshd + language runtimes + AI CLIs on the Debian 13 base) builds and runs as one composed pod. Builds box:debian-coder, deploys it, and runs the composed candies' baked file/package/service/command/addr checks plus the bed's own sshd-service, language-runtime-binary, and charly status --json (status-shows-pod) probes.
