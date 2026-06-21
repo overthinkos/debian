@@ -1,5 +1,5 @@
 debian-coder:
-    box:
+    candy:
         base: debian
     debian-coder-candy:
         candy:

@@ -1,5 +1,5 @@
 debian-builder:
-    box:
+    candy:
         base: debian
         produce:
             - pixi
