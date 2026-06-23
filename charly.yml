@@ -46,7 +46,7 @@ check-debian-debootstrap-vm:
         # the .deb (not in Debian main) — the charly candy supplies it via the tailscale
         # apt repo, so it must ALSO be present after deploy.
         add_candy:
-            - '@github.com/overthinkos/overthink/candy/charly:v2026.170.1105'
+            - '@github.com/overthinkos/overthink/candy/charly:v2026.174.0425'
     check-debian-debootstrap-vm-install_opts:
         install_opts:
             allow_repo_changes: true

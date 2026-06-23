@@ -9,4 +9,4 @@ debian-debootstrap-builder:
             - debian
     debian-debootstrap-builder-candy:
         candy:
-            - '@github.com/overthinkos/overthink/candy/debootstrap-builder:v2026.170.1105'
+            - '@github.com/overthinkos/overthink/candy/debootstrap-builder:v2026.174.0425'
