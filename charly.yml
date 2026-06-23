@@ -17,7 +17,7 @@
 #  Directly buildable: `charly box build debian` (the build verb defaults to this
 #  charly.yml). From the parent repo: `charly -C box/debian box build
 #  debian`, or anywhere: `charly --repo overthinkos/debian box build debian`.
-version: 2026.174.0300
+version: 2026.174.0500
 defaults:
     platform:
         - linux/amd64
@@ -63,27 +63,31 @@ check-debian-debootstrap-vm:
             echo LOCALPKG-DEB-AUTORESOLVE-OK
         id: localpkg-deb-autoresolve
         description: charly installed as the opencharly .deb via localpkg, mandatory deps auto-resolved by apt; tailscale supplied by the charly layer
-        command: |
-            dpkg -s opencharly >/dev/null 2>&1 &&
-            dpkg -s podman >/dev/null 2>&1 &&
-            dpkg -s libvirt-daemon-system >/dev/null 2>&1 &&
-            dpkg -s tailscale >/dev/null 2>&1 &&
-            command -v charly >/dev/null 2>&1 &&
-            charly version &&
-            echo LOCALPKG-DEB-AUTORESOLVE-OK
         stdout:
             - contains: LOCALPKG-DEB-AUTORESOLVE-OK
         exit_status: 0
         context:
             - runtime
+        plugin: command
+        plugin_input:
+            command: |
+                dpkg -s opencharly >/dev/null 2>&1 &&
+                dpkg -s podman >/dev/null 2>&1 &&
+                dpkg -s libvirt-daemon-system >/dev/null 2>&1 &&
+                dpkg -s tailscale >/dev/null 2>&1 &&
+                command -v charly >/dev/null 2>&1 &&
+                charly version &&
+                echo LOCALPKG-DEB-AUTORESOLVE-OK
     tailscale-repo-suite-debian-trixie:
         check: command=grep -h 'pkgs[.]tailscale[.]com/stable/debian trixie' /etc/apt/sources.list.d/tailscale.list
         id: tailscale-repo-suite-debian-trixie
         description: distro-cascade resolves the debian/trixie tailscale apt repo (not ubuntu/noble) deterministically
-        command: grep -h 'pkgs[.]tailscale[.]com/stable/debian trixie' /etc/apt/sources.list.d/tailscale.list
         exit_status: 0
         context:
             - runtime
+        plugin: command
+        plugin_input:
+            command: grep -h 'pkgs[.]tailscale[.]com/stable/debian trixie' /etc/apt/sources.list.d/tailscale.list
 # Disposable R10 pod bed for the debian-coder developer image — closes the
 # pod×debian cross-cell the submodule previously lacked (it shipped only the
 # debootstrap VM bed above), mirroring box/fedora's check-fedora-coder-pod on
@@ -111,13 +115,15 @@ check-debian-coder-pod:
     status-shows-pod:
         check: command=charly status --json
         id: status-shows-pod
-        command: charly status --json
-        in_container: false
         stdout:
             - contains: '"kind": "pod"'
             - contains: check-debian-coder-pod
         context:
             - runtime
+        plugin: command
+        plugin_input:
+            command: charly status --json
+            in_container: false
 debian-debootstrap:
     vm:
         #  `source.kind: bootstrap` builds a Debian rootfs from scratch via
